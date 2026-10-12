@@ -76,8 +76,8 @@ def comments_in(lines, ext):
             if end in line:
                 open_block = None
         else:
-            # Strings are blanked before the marker search so "http://x" is not a comment.
-            code = STRINGS.sub('""', line)
+            # Strings are blanked at equal length so "http://x" is not a comment and offsets still match.
+            code = STRINGS.sub(lambda s: s.group()[0] + " " * (len(s.group()) - 2) + s.group()[-1], line)
             for start, end in blocks:
                 pos = code.find(start)
                 if pos < 0:
@@ -100,9 +100,8 @@ def comments_in(lines, ext):
                 for m in line_marks:
                     pos = code.find(m)
                     if pos >= 0 and not (m == "//" and pos > 0 and code[pos - 1] == ":"):
-                        at = line.find(m)
-                        text = line[at + len(m):].strip()
-                        is_doc = line[at:].startswith(DOC_OPENERS)
+                        text = line[pos + len(m):].strip()
+                        is_doc = line[pos:].startswith(DOC_OPENERS)
                         break
         if text is None:
             prev_was_comment = False
@@ -286,6 +285,8 @@ def self_test():
     assert reasons("a.ts", ['const s = "// previously";']) == []
     assert reasons("a.py", ["x = 1  # no longer"]) == [(1, "history")]
     assert reasons("a.py", ["s = '# changed from'"]) == []
+    assert reasons("a.py", ['f("# import os")  # no longer']) == [(1, "history")]
+    assert reasons("a.py", ['f("# import os")  # Keep: the API wants it.']) == []
     assert reasons("a.txt", ["previously nothing"]) == []
     # real why / trap / coupling comments pass
     good = [
