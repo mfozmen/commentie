@@ -1,6 +1,6 @@
 {
   "name": "commentie",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Keep code comments few, short and plain: a writing rule that loads with your code, a cleanup pass, a cheap warning-only critic, and a stdlib script that flags narrative comments in a diff.",
   "author": {
     "name": "Mehmet Fahri Özmen"

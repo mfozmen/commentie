@@ -32,7 +32,7 @@ DOC_OPENERS = ("/**", "///", '"""', "'''")
 
 HISTORY = re.compile(
     r"(?<![\w-])(previously|changed (from|to|in|since)|now we|fix(ed|es) (a |the )?(bug|issue|crash|typo)"
-    r"|used to|no longer|new:|old (code|version|implementation|way)|renamed from|moved from"
+    r"|used to|no longer|new:|old:|old (code|version|implementation|way)|renamed from|moved from"
     r"|refactored (from|out)|was (removed|added|replaced))(?![\w-])", re.I)
 ISSUE_ONLY = re.compile(
     r"^(see |fixes |closes |refs? |resolves |related:? )?"
@@ -43,6 +43,7 @@ CODE_HEAD = re.compile(
     r"|update|delete|drop|alter|create|fmt\.|log\.|raise|throw|new|elif|end|require|include|package)\b")
 CODE_SHAPE = re.compile(r"^[A-Za-z_][\w.\[\]]*\s*(=[^=]|\+=|-=|\(.*\)\s*;?$)")
 CODE_TAIL = re.compile(r"[;{}]\s*$|\)\s*;$")
+CODE_CHARS = re.compile(r"[(){}\[\];=]|\w\.\w|:$")
 PROSE = re.compile(r"^[A-Z][a-z].*[.!?]$")
 LICENCE = re.compile(r"copyright|licen[cs]e|spdx", re.I)
 STRINGS = re.compile(r'"(?:\\.|[^"\\])*"|' + r"'(?:\\.|[^'\\])*'")
@@ -121,7 +122,11 @@ def classify(text):
         return "issue-ref: ticket reference as the whole comment; say the why instead"
     if HISTORY.search(t):
         return "history: how the code got here belongs in the commit message"
-    if not PROSE.match(t) and (CODE_HEAD.match(t) or CODE_SHAPE.match(t) or CODE_TAIL.search(t)):
+    if PROSE.match(t):
+        return None
+    # "return the rows" is narration, not code: a keyword alone needs code punctuation or brevity.
+    keyword_code = CODE_HEAD.match(t) and (CODE_CHARS.search(t) or len(t.split()) <= 2)
+    if keyword_code or CODE_SHAPE.match(t) or CODE_TAIL.search(t):
         return "dead-code: commented-out code; delete it, git remembers"
     return None
 
@@ -260,6 +265,10 @@ def self_test():
     assert reasons("a.py", ["# import os"]) == [(1, "dead-code")]
     assert reasons("a.sql", ["-- SELECT * FROM users;"]) == [(1, "dead-code")]
     assert reasons("a.py", ["# Return early: the cache is stale after midnight."]) == []
+    assert reasons("a.py", ["# return early when the cache is warm"]) == []
+    assert reasons("a.py", ["# create a dict reader"]) == []           # narration is the critic's job
+    assert reasons("a.py", ['# old: return sum(float(r["a"]) for r in rows)']) == [(1, "history")]
+    assert reasons("a.py", ["# if cached:"]) == [(1, "dead-code")]
     # long blocks
     six = ["// line %d of a long explanation" % i for i in range(6)]
     assert reasons("a.ts", six) == [(1, "long-block")]

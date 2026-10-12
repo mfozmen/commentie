@@ -32,7 +32,8 @@ with a reason, TODOs that name a concrete condition.
    the working tree (`git diff HEAD`).
 2. Mechanical pass. Run
    `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/check_comments.py" <range>`
-   (or `python` if `python3` is missing). Take its findings as given.
+   (or `python` if `python3` is missing). Take its findings and its line
+   numbers as given; they come from the diff. Do not recount.
 3. Added lines only. Run `git diff -U0 <range>` and judge every ADDED comment
    against the rule. Ignore removed and context lines completely: a comment
    the change did not touch is never your business.
