@@ -1,0 +1,18 @@
+diff --git a/src/users.py b/src/users.py
+--- a/src/users.py
++++ b/src/users.py
+@@ -0,0 +1,14 @@
++# previously this loaded all users eagerly
++def load_active(db):
++    # loop over users and add the active ones to the list
++    out = []
++    for u in db.users():
++        # check if user is active
++        if u.active:
++            out.append(u)
++    # result = sorted(out)
++    # #4521
++    return out
++
++
++# changed from list to generator in v2

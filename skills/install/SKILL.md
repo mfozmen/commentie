@@ -1,0 +1,65 @@
+---
+name: install
+description: Set commentie up in this project: add a short comments rule to CLAUDE.md or AGENTS.md, and offer to wire check_comments.py into pre-commit or CI. Changes nothing without asking.
+disable-model-invocation: true
+allowed-tools: Bash(ls *), Bash(cat *), Bash(git rev-parse *)
+---
+
+# Install commentie into this project
+
+Ask before every change, one question at a time. Show the exact text or
+diff first.
+
+## 1. Project rule
+
+Find `CLAUDE.md` or `AGENTS.md` at the project root. If both exist, prefer
+`CLAUDE.md`. If neither exists, ask which to create. Skip this step when the
+file already contains a `## Comments` heading.
+
+Propose appending:
+
+```md
+## Comments
+
+Follow the `commentie:comments` skill. Clear code needs no comment. Comment only
+a non-obvious why, a trap, or a hidden coupling, in one or two short sentences.
+No narration, no history, no commented-out code, no bare issue refs.
+Reviewers: a narrative comment is a warning, reported once per branch, never a blocker.
+```
+
+## 2. Script wiring (optional)
+
+The plugin path changes on every update, so a pre-commit hook or CI step
+should not point into it. Offer to copy
+`${CLAUDE_PLUGIN_ROOT}/scripts/check_comments.py` to `scripts/check_comments.py`
+in the project (one stdlib file, no dependencies). Only then offer, each as
+its own question:
+
+- **pre-commit**: if `.pre-commit-config.yaml` exists, add
+  ```yaml
+  - repo: local
+    hooks:
+      - id: commentie
+        name: commentie
+        entry: python scripts/check_comments.py --staged
+        language: system
+        pass_filenames: false
+  ```
+  If `package.json` has husky or lint-staged, add
+  `python scripts/check_comments.py --staged` to the pre-commit script.
+  Otherwise offer a plain `.git/hooks/pre-commit` and say it is local only.
+- **CI**: if `.github/workflows/` exists, add a step to the main workflow:
+  ```yaml
+  - run: python scripts/check_comments.py origin/${{ github.base_ref || 'main' }}..HEAD
+  ```
+  with `fetch-depth: 0` on the checkout.
+
+Default to warning-only (no `--strict`). Mention `--strict` once as the
+opt-in that fails the commit or the job.
+
+## 3. Hook
+
+Say in one line: the after-edit check is off; enable it with
+`/plugin configure commentie@devkit` and turn on "Check comments after each edit".
+
+Finish with a two-line summary of what changed.

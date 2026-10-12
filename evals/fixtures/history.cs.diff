@@ -1,0 +1,20 @@
+diff --git a/Auth/TokenClient.cs b/Auth/TokenClient.cs
+--- a/Auth/TokenClient.cs
++++ b/Auth/TokenClient.cs
+@@ -0,0 +1,16 @@
++// Fixed bug where the token was refreshed twice.
++// Now we check the expiry first, then refresh.
++public async Task<string> GetTokenAsync()
++{
++    /*
++     * This method retrieves the token from the cache.
++     * If the token is missing, it calls the auth server.
++     * The auth server returns a JWT.
++     * We then store the JWT in the cache.
++     * Finally we return the JWT to the caller.
++     * The caller uses it in the Authorization header.
++     */
++    if (_cache.TryGet(out var t) && !Expired(t)) return t;
++    // var old = await _legacy.GetAsync();
++    return await RefreshAsync();
++}

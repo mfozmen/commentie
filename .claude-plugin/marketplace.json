@@ -1,0 +1,16 @@
+{
+  "name": "commentie",
+  "owner": {
+    "name": "mfozmen"
+  },
+  "metadata": {
+    "description": "commentie, installable on its own."
+  },
+  "plugins": [
+    {
+      "name": "commentie",
+      "source": "./",
+      "description": "Keep code comments few, short and plain: a writing rule, a cleanup pass, a cheap warning-only critic, and a stdlib script that flags narrative comments in a diff."
+    }
+  ]
+}

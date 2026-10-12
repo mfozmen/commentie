@@ -1,0 +1,10 @@
+diff --git a/db/migrations/0042_orders_status.sql b/db/migrations/0042_orders_status.sql
+--- a/db/migrations/0042_orders_status.sql
++++ b/db/migrations/0042_orders_status.sql
+@@ -0,0 +1,6 @@
++-- Partial index: 90% of rows have status NULL and are never queried.
++CREATE INDEX idx_orders_status ON orders(status) WHERE status IS NOT NULL;
++
++-- SELECT count(*) FROM orders WHERE status IS NULL;
++-- PROJ-881
++-- This used to be a full index.

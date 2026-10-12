@@ -1,0 +1,13 @@
+diff --git a/src/count.ts b/src/count.ts
+--- a/src/count.ts
++++ b/src/count.ts
+@@ -0,0 +1,9 @@
++// Create a new map to hold the counts
++const counts = new Map<string, number>();
++// Iterate over the items
++for (const item of items) {
++  // Increment the count for this key
++  counts.set(item.key, (counts.get(item.key) ?? 0) + 1);
++}
++// Return the counts
++return counts;

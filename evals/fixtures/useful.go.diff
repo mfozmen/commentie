@@ -1,0 +1,21 @@
+diff --git a/store/store.go b/store/store.go
+--- a/store/store.go
++++ b/store/store.go
+@@ -0,0 +1,17 @@
++// Copyright 2026 Example Inc.
++// Licensed under the MIT License.
++// See LICENSE for details.
++// You may not use this file except in compliance with the License.
++// Unless required by law, software is distributed "AS IS".
++// See the License for the specific language governing permissions.
++package store
++
++// Open returns a Store backed by path. It creates the file when missing.
++func Open(path string) (*Store, error) {
++	// O_SYNC: the WAL relies on each write hitting disk before the ack.
++	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_SYNC, 0o600)
++	if err != nil {
++		return nil, err
++	}
++	return &Store{f: f}, nil
++}

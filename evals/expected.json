@@ -1,0 +1,22 @@
+{
+  "_": "Per fixture: the file:line pairs the script must flag, and the critic verdict (warn | clean). Narration without history words is the critic's job, so narration_only expects no script finding.",
+  "narrative.py.diff": {
+    "script": ["src/users.py:1", "src/users.py:9", "src/users.py:10", "src/users.py:14"],
+    "critic": "warn"
+  },
+  "useful.ts.diff": { "script": [], "critic": "clean" },
+  "history.cs.diff": {
+    "script": ["Auth/TokenClient.cs:1", "Auth/TokenClient.cs:2", "Auth/TokenClient.cs:5", "Auth/TokenClient.cs:14"],
+    "critic": "warn"
+  },
+  "useful.go.diff": { "script": [], "critic": "clean" },
+  "mixed.sql.diff": {
+    "script": [
+      "db/migrations/0042_orders_status.sql:4",
+      "db/migrations/0042_orders_status.sql:5",
+      "db/migrations/0042_orders_status.sql:6"
+    ],
+    "critic": "warn"
+  },
+  "narration_only.ts.diff": { "script": [], "critic": "warn" }
+}
