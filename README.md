@@ -62,6 +62,17 @@ real why, trap and coupling comments the script must not flag. Critic verdicts
 are checked by running `@agent-commentie:comment-critic` on a fixture applied
 to a scratch repo.
 
+## Releasing
+
+Releases are cut by [release-please](https://github.com/googleapis/release-please)
+from [Conventional Commits](https://www.conventionalcommits.org/). PRs are
+squash-merged, so the PR title is the commit: `feat: ...` bumps the minor
+version, `fix: ...` the patch, `feat!: ...` or a `BREAKING CHANGE:` footer the
+minor while below 1.0. `docs`, `ci`, `chore`, `test` and `refactor` release
+nothing on their own. After each merge to `main`, release-please updates a
+release PR that bumps `.claude-plugin/plugin.json` and `CHANGELOG.md`; merging
+it tags `vX.Y.Z` and publishes the GitHub release.
+
 ## Licence
 
 MIT
