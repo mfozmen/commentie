@@ -29,6 +29,17 @@ Reviewers: a narrative comment is a warning, reported once per branch, never a b
 
 ## 2. Script wiring (optional)
 
+Before asking, tell the user what the script is, in two or three lines:
+`check_comments.py` is a regex check, not a model. It reads only the added
+lines of a diff and flags history words, bare issue refs, commented-out code
+and long blocks. It costs no tokens, finishes in under a second, gives the
+same result every run, and covers commits from people who do not use Claude.
+With `--strict` it can fail the commit or the job, which an AI review usually
+cannot. It is worth adding when the project has no AI review, wants a hard
+gate, or already uses pre-commit. If CI already runs an AI review that reads
+the comments rule and warnings are enough, say the script is optional and
+skipping it is fine.
+
 The plugin path changes on every update, so a pre-commit hook or CI step
 should not point into it. Offer to copy
 `${CLAUDE_PLUGIN_ROOT}/scripts/check_comments.py` to `scripts/check_comments.py`
