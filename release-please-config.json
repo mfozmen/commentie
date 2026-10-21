@@ -19,7 +19,8 @@
         { "type": "chore", "section": "Chores", "hidden": true }
       ],
       "extra-files": [
-        { "type": "json", "path": ".claude-plugin/plugin.json", "jsonpath": "$.version" }
+        { "type": "json", "path": ".claude-plugin/plugin.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "package.json", "jsonpath": "$.version" }
       ]
     }
   }
