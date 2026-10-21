@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/mfozmen/commentie/compare/v0.1.3...v0.2.0) (2026-10-21)
+
+
+### Features
+
+* add OpenCode plugin ([#2](https://github.com/mfozmen/commentie/issues/2)) ([8e9060a](https://github.com/mfozmen/commentie/commit/8e9060aa5403d44bfd80935a143159067a921c11))
+
+
+### Documentation
+
+* split Claude Code and OpenCode setup in the README ([b36dfa6](https://github.com/mfozmen/commentie/commit/b36dfa68d9cf96423019d26898e43ba301075b05))
+
 ## 0.1.3 (2026-10-19)
 
 First tagged release.

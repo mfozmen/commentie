@@ -1,6 +1,6 @@
 {
   "name": "commentie",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Keep code comments few, short and plain: a writing rule that loads with your code, a cleanup pass, a cheap warning-only critic, and a stdlib script that flags narrative comments in a diff.",
   "author": {
     "name": "Mehmet Fahri Özmen"
@@ -8,7 +8,12 @@
   "homepage": "https://github.com/mfozmen/commentie",
   "repository": "https://github.com/mfozmen/commentie",
   "license": "MIT",
-  "keywords": ["comments", "code-quality", "review", "claude-code"],
+  "keywords": [
+    "comments",
+    "code-quality",
+    "review",
+    "claude-code"
+  ],
   "userConfig": {
     "hook_enabled": {
       "type": "boolean",
