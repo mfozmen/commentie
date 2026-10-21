@@ -1,19 +1,30 @@
 name: npm
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: [release]
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
   id-token: write
 jobs:
   publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
       - run: npm install -g npm@latest
-      - run: npm publish --access public --provenance
+      - name: Publish a release tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ] && ! git describe --tags --exact-match >/dev/null 2>&1; then
+            echo "HEAD is not a release tag"
+            exit 0
+          fi
+          npm publish --access public --provenance
