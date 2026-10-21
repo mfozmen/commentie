@@ -35,7 +35,13 @@ function findPython() {
 function changedFiles(input: { tool: string; args: any }, metadata: any) {
   if (input.tool === "apply_patch" || input.tool === "patch") {
     const files = Array.isArray(metadata?.files) ? metadata.files : []
-    return [...new Set(files.map((file: any) => file?.filePath).filter((file: any) => typeof file === "string"))]
+    return [
+      ...new Set(
+        files
+          .map((file: any) => file?.movePath ?? file?.filePath)
+          .filter((file: any) => typeof file === "string"),
+      ),
+    ]
   }
   const file = input.args?.filePath
   return typeof file === "string" && file ? [file] : []
@@ -66,7 +72,6 @@ export const Commentie: Plugin = async (input, rawOptions?: PluginOptions) => {
         mode: "subagent",
         prompt: critic,
         steps: 15,
-        maxSteps: 15,
         color: "#e5c07b",
         permission: { edit: "deny" },
         ...(criticModel ? { model: criticModel } : {}),

@@ -1,8 +1,11 @@
 import { expect, test } from "bun:test"
+import { mkdtempSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import path from "node:path"
 import { Commentie } from "../../opencode/plugin"
 
-async function loaded(options: Record<string, unknown> = {}) {
-  const hooks = await Commentie({ directory: process.cwd() } as any, options)
+async function loaded(options: Record<string, unknown> = {}, directory = process.cwd()) {
+  const hooks = await Commentie({ directory } as any, options)
   const config: any = {}
   await hooks.config!(config)
   return { hooks, config }
@@ -36,4 +39,24 @@ test("leaves the edit hook off by default", async () => {
     output,
   )
   expect(output.output).toBe("Applied")
+})
+
+test("checks the destination of an apply_patch move", async () => {
+  const directory = mkdtempSync(path.join(tmpdir(), "commentie-"))
+  const from = path.join(directory, "a.py")
+  const to = path.join(directory, "b.py")
+  writeFileSync(from, "x = 1\n")
+  writeFileSync(to, "x = 1\n# previously this was different\n")
+
+  const { hooks } = await loaded({ hook: true }, directory)
+  const output = {
+    title: "Patch",
+    output: "Applied",
+    metadata: { files: [{ filePath: from, movePath: to }] },
+  }
+  await hooks["tool.execute.after"]!(
+    { tool: "apply_patch", sessionID: "s", callID: "c", args: { patchText: "" } },
+    output,
+  )
+  expect(output.output).toContain("history")
 })

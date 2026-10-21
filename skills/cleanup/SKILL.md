@@ -17,8 +17,7 @@ ask which files.
 1. Mechanical pass first. Run
    `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/check_comments.py" --diff-file -`
    with the diff on stdin (or `python` if `python3` is missing). For a path,
-   run it with `--diff-file` on a diff you build from the whole file, or just
-   read the file: the script only knows diffs.
+   run it with `--file <path>`; for a git range, pass the range directly.
 2. Read each comment in scope and sort it into one bucket:
    - **delete**: narration of what the code does, history (`previously`,
      `changed from`, `fixed`, `now we`, `new:`), commented-out code, a bare

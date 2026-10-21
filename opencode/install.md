@@ -5,9 +5,10 @@ first.
 
 ## 1. Project rule
 
-Find `AGENTS.md` or `CLAUDE.md` at the project root. OpenCode reads both. If
-both exist, prefer `AGENTS.md`. If neither exists, ask which to create. Skip
-this step when the file already contains a `## Comments` heading.
+Find `AGENTS.md` or `CLAUDE.md` at the project root. OpenCode uses the first
+it finds, `AGENTS.md` before `CLAUDE.md`, so prefer `AGENTS.md` when both
+exist. If neither exists, ask which to create. Skip this step when the file
+already contains a `## Comments` heading.
 
 Propose appending:
 
