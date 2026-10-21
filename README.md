@@ -1,5 +1,9 @@
 # commentie
 
+[![npm version](https://img.shields.io/npm/v/commentie.svg)](https://www.npmjs.com/package/commentie)
+[![npm downloads](https://img.shields.io/npm/dm/commentie.svg)](https://www.npmjs.com/package/commentie)
+[![license](https://img.shields.io/npm/l/commentie.svg)](https://github.com/mfozmen/commentie/blob/main/LICENSE)
+
 A Claude Code and OpenCode plugin that keeps code comments few, short and
 plain.
 
