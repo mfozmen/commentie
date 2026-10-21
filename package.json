@@ -1,6 +1,6 @@
 {
   "name": "commentie",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Keep code comments few, short and plain, as a Claude Code plugin and an OpenCode plugin.",
   "type": "module",
   "main": "opencode/plugin.ts",
