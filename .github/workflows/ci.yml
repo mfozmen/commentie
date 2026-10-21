@@ -10,7 +10,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+      - uses: oven-sh/setup-bun@v2
       - run: python scripts/check_comments.py --self-test
       - run: python evals/run_evals.py
+      - run: bun test tests/opencode
       - run: python scripts/check_comments.py origin/${{ github.base_ref || 'main' }}..HEAD
         if: github.event_name == 'pull_request'

@@ -1,16 +1,30 @@
 # commentie
 
-A Claude Code plugin that keeps code comments few, short and plain.
+A Claude Code and OpenCode plugin that keeps code comments few, short and
+plain.
 
 AI-written code fills with narrative comments, and reviews then loop on fixing
 prose. commentie teaches the rule while code is written, cleans up on demand,
 and guards cheaply: a stdlib script first, a Haiku critic second, and the
 critic warns once per branch and never blocks.
 
+Claude Code:
+
 ```
 /plugin marketplace add mfozmen/devkit
 /plugin install commentie@devkit
 ```
+
+OpenCode, once published to npm:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["commentie"]
+}
+```
+
+See [OpenCode](#opencode) for local checkouts and options.
 
 ## The rule
 
@@ -30,11 +44,15 @@ docblocks that restate the signature.
 | hook (off by default) | Runs the script after every Edit or Write and shows findings to Claude. Never blocks. |
 | `/commentie:install` | Adds the rule to CLAUDE.md or AGENTS.md and offers pre-commit or CI wiring. Asks before every change. |
 
+The names above are Claude Code's; the [OpenCode](#opencode) section maps them
+one to one.
+
 ## The script
 
 ```
 python scripts/check_comments.py                 # staged changes
 python scripts/check_comments.py main..HEAD      # a range
+python scripts/check_comments.py --file src/a.py # one file against HEAD
 python scripts/check_comments.py --strict ...    # exit 1 on findings
 python scripts/check_comments.py --self-test
 ```
@@ -43,11 +61,50 @@ Output is `file:line: reason`. Exit code is 0 unless `--strict`.
 Skip patterns with a `.commentie-allow` file at the repo root, one regex per
 line. Change the long-block threshold with `--max-block N` (default 5).
 
-## The hook
+## The hook (Claude Code)
 
 Off by default. Turn it on with `/plugin configure commentie@devkit` and enable
 "Check comments after each edit", or at install time with
 `claude plugin install commentie@devkit --config hook_enabled=true`.
+
+## OpenCode
+
+The plugin registers itself and needs no files copied into the project. For a
+local checkout, point the config at the repo directory:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["file:///absolute/path/to/commentie"]
+}
+```
+
+Everything maps one to one:
+
+| Claude Code | OpenCode |
+|---|---|
+| skill `comments`, loaded with code files | the same rule, injected into the system prompt |
+| `/commentie:cleanup [range \| path]` | `/commentie-cleanup [range \| path]` |
+| `/commentie:install` | `/commentie-install` |
+| agent `commentie:comment-critic` | subagent `comment-critic` |
+| hook after Edit and Write | hook after edit, write and apply_patch, off by default |
+
+Options go in the second element of the plugin entry:
+
+```json
+{
+  "plugin": [["file:///absolute/path/to/commentie", { "hook": true }]]
+}
+```
+
+- `hook` (default `false`): append findings to the tool result after an edit.
+  `COMMENTIE_HOOK=true` enables it too.
+- `criticModel`: pin the critic to a model, for example
+  `"anthropic/claude-haiku-4-5"`. Without it the critic uses your default
+  model.
+
+The hook finds `python3` or `python` on `PATH`; the script is the same one
+described below.
 
 ## Evals
 
@@ -70,8 +127,10 @@ squash-merged, so the PR title is the commit: `feat: ...` bumps the minor
 version, `fix: ...` the patch, `feat!: ...` or a `BREAKING CHANGE:` footer the
 minor while below 1.0. `docs`, `ci`, `chore`, `test` and `refactor` release
 nothing on their own. After each merge to `main`, release-please updates a
-release PR that bumps `.claude-plugin/plugin.json` and `CHANGELOG.md`; merging
-it tags `vX.Y.Z` and publishes the GitHub release.
+release PR that bumps `.claude-plugin/plugin.json`, `package.json` and
+`CHANGELOG.md`; merging it tags `vX.Y.Z` and publishes the GitHub release.
+Publishing the same version to npm with `npm publish` makes
+`"plugin": ["commentie"]` work for OpenCode; a local path works without it.
 
 ## Licence
 
