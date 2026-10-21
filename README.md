@@ -5,26 +5,8 @@ plain.
 
 AI-written code fills with narrative comments, and reviews then loop on fixing
 prose. commentie teaches the rule while code is written, cleans up on demand,
-and guards cheaply: a stdlib script first, a Haiku critic second, and the
-critic warns once per branch and never blocks.
-
-Claude Code:
-
-```
-/plugin marketplace add mfozmen/devkit
-/plugin install commentie@devkit
-```
-
-OpenCode, once published to npm:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["commentie"]
-}
-```
-
-See [OpenCode](#opencode) for local checkouts and options.
+and guards cheaply: a stdlib script first, a cheap read-only critic second, and
+the critic warns once per branch and never blocks.
 
 ## The rule
 
@@ -37,15 +19,68 @@ docblocks that restate the signature.
 
 | Piece | What it does |
 |---|---|
-| skill `comments` | The rule with examples in Python, TypeScript, C#, Go and SQL. Loads when Claude edits code. |
-| `/commentie:cleanup [range \| path]` | Deletes narration and history, shortens the rest, keeps every why, trap and coupling. Never touches code. Lists what it was unsure about instead of deleting it. |
-| agent `commentie:comment-critic` | Read-only review of the comments a diff range added, on Haiku. One WARNING finding, raised once per branch. |
-| `scripts/check_comments.py` | Stdlib, no dependencies. Flags history words, bare issue refs, commented-out code and long blocks in the added lines of a diff. |
-| hook (off by default) | Runs the script after every Edit or Write and shows findings to Claude. Never blocks. |
-| `/commentie:install` | Adds the rule to CLAUDE.md or AGENTS.md and offers pre-commit or CI wiring. Asks before every change. |
+| Rule | The writing rule, with examples in Python, TypeScript, C#, Go and SQL. |
+| Cleanup | Deletes narration and history, shortens the rest, keeps every why, trap and coupling. Never touches code. Lists what it was unsure about instead of deleting it. |
+| Critic | Read-only review of the comments a diff range added. One WARNING finding, raised once per branch. |
+| Script | Stdlib, no dependencies. Flags history words, bare issue refs, commented-out code and long blocks in the added lines of a diff. |
+| Hook | Off by default. Runs the script after an edit and shows findings as a warning. Never blocks. |
+| Install | Adds the rule to CLAUDE.md or AGENTS.md and offers pre-commit or CI wiring. Asks before every change. |
 
-The names above are Claude Code's; the [OpenCode](#opencode) section maps them
-one to one.
+## Claude Code
+
+```
+/plugin marketplace add mfozmen/devkit
+/plugin install commentie@devkit
+```
+
+- Rule: the `commentie:comments` skill, loaded when Claude edits code.
+- Cleanup: `/commentie:cleanup [range | path]`.
+- Install: `/commentie:install`.
+- Critic: the read-only `commentie:comment-critic` agent, on Haiku.
+
+The after-edit hook is off by default. Enable it with
+`/plugin configure commentie@devkit` and turn on "Check comments after each
+edit", or at install time:
+
+```
+claude plugin install commentie@devkit --config hook_enabled=true
+```
+
+## OpenCode
+
+For a local checkout, point the config at the repo directory:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["file:///absolute/path/to/commentie"]
+}
+```
+
+Once published to npm, `"plugin": ["commentie"]` works too. The plugin
+registers itself; no files are copied into the project.
+
+- Rule: the same rule, injected into the system prompt.
+- Cleanup: `/commentie-cleanup [range | path]`.
+- Install: `/commentie-install`.
+- Critic: the read-only `comment-critic` subagent, using your default model
+  unless pinned.
+
+The after-edit hook is off by default. Add options as the second element of the
+plugin entry:
+
+```json
+{
+  "plugin": [["file:///absolute/path/to/commentie", { "hook": true }]]
+}
+```
+
+- `hook` (default `false`): append findings to the tool result after an edit.
+- `criticModel`: pin the critic to a model, for example
+  `"anthropic/claude-haiku-4-5"`.
+
+`COMMENTIE_HOOK=true` enables the hook too. The hook finds `python3` or `python`
+on `PATH`.
 
 ## The script
 
@@ -60,51 +95,6 @@ python scripts/check_comments.py --self-test
 Output is `file:line: reason`. Exit code is 0 unless `--strict`.
 Skip patterns with a `.commentie-allow` file at the repo root, one regex per
 line. Change the long-block threshold with `--max-block N` (default 5).
-
-## The hook (Claude Code)
-
-Off by default. Turn it on with `/plugin configure commentie@devkit` and enable
-"Check comments after each edit", or at install time with
-`claude plugin install commentie@devkit --config hook_enabled=true`.
-
-## OpenCode
-
-The plugin registers itself and needs no files copied into the project. For a
-local checkout, point the config at the repo directory:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["file:///absolute/path/to/commentie"]
-}
-```
-
-Everything maps one to one:
-
-| Claude Code | OpenCode |
-|---|---|
-| skill `comments`, loaded with code files | the same rule, injected into the system prompt |
-| `/commentie:cleanup [range \| path]` | `/commentie-cleanup [range \| path]` |
-| `/commentie:install` | `/commentie-install` |
-| agent `commentie:comment-critic` | subagent `comment-critic` |
-| hook after Edit and Write | hook after edit, write and apply_patch, off by default |
-
-Options go in the second element of the plugin entry:
-
-```json
-{
-  "plugin": [["file:///absolute/path/to/commentie", { "hook": true }]]
-}
-```
-
-- `hook` (default `false`): append findings to the tool result after an edit.
-  `COMMENTIE_HOOK=true` enables it too.
-- `criticModel`: pin the critic to a model, for example
-  `"anthropic/claude-haiku-4-5"`. Without it the critic uses your default
-  model.
-
-The hook finds `python3` or `python` on `PATH`; the script is the same one
-described below.
 
 ## Evals
 
