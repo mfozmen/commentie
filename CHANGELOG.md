@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/mfozmen/commentie/compare/v0.2.0...v0.2.1) (2026-10-21)
+
+
+### Documentation
+
+* add npm badges to the README ([#5](https://github.com/mfozmen/commentie/issues/5)) ([ed238f3](https://github.com/mfozmen/commentie/commit/ed238f38b0a526b09d921453279705e303b7b433))
+
 ## [0.2.0](https://github.com/mfozmen/commentie/compare/v0.1.3...v0.2.0) (2026-10-21)
 
 
